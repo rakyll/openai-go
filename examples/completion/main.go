@@ -16,7 +16,7 @@ func main() {
 	client := completion.NewClient(s, "text-davinci-003")
 	resp, err := client.Complete(ctx, &completion.Parameters{
 		N:         1,
-		MaxTokens: 7,
+		MaxTokens: 200,
 		Prompt:    []string{"say this is a test"},
 	})
 	if err != nil {
