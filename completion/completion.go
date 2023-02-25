@@ -29,6 +29,7 @@ func NewClient(session *openai.Session, model string) *Client {
 }
 
 type Parameters struct {
+	Model  string   `json:"model,omitempty"`
 	Prompt []string `json:"prompt,omitempty"`
 	Stop   []string `json:"stop,omitempty"`
 	Suffix string   `json:"suffix,omitempty"`
@@ -65,6 +66,10 @@ type Choice struct {
 }
 
 func (c *Client) Complete(ctx context.Context, p *Parameters) (*Response, error) {
+	if p.Model == "" {
+		p.Model = c.model
+	}
+
 	// TODO: Make sure we omit zero fields correctly.
 	buf, err := json.Marshal(p)
 	if err != nil {
