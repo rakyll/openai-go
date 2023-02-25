@@ -2,10 +2,7 @@
 package completion
 
 import (
-	"bytes"
 	"context"
-	"encoding/json"
-	"net/http"
 
 	"github.com/rakyll/openai-go"
 )
@@ -81,26 +78,8 @@ func (c *Client) Complete(ctx context.Context, p *Parameters) (*Response, error)
 		p.Model = c.model
 	}
 
-	// TODO: Make sure we omit zero fields correctly.
-	buf, err := json.Marshal(p)
-	if err != nil {
-		return nil, err
-	}
-	req, err := http.NewRequest("POST", c.Endpoint, bytes.NewReader(buf))
-	if err != nil {
-		return nil, err
-	}
-
-	req = req.WithContext(ctx)
-	resp, err := c.s.MakeRequest(req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-
 	var r Response
-	decoder := json.NewDecoder(resp.Body)
-	if err := decoder.Decode(&r); err != nil {
+	if err := c.s.MakeRequest(ctx, c.Endpoint, p, &r); err != nil {
 		return nil, err
 	}
 	return &r, nil

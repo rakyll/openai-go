@@ -2,6 +2,9 @@
 package openai
 
 import (
+	"bytes"
+	"context"
+	"encoding/json"
 	"net/http"
 	"time"
 )
@@ -25,15 +28,33 @@ func NewSession(apiKey string) *Session {
 	}
 }
 
-// MakeRequest makes HTTP requests and authenticates them with
-// session's API key.
-func (s *Session) MakeRequest(r *http.Request) (*http.Response, error) {
-	if s.apiKey != "" {
-		r.Header.Set("Authorization", "Bearer "+s.apiKey)
+// MakeRequest make HTTP requests and authenticates them with
+// session's API key. MakeRequest marshals input as the request body,
+// and unmarshals the response as output.
+func (s *Session) MakeRequest(ctx context.Context, endpoint string, input, output interface{}) error {
+	buf, err := json.Marshal(input)
+	if err != nil {
+		return err
 	}
-	r.Header.Set("Content-Type", "application/json")
+
+	req, err := http.NewRequest("POST", endpoint, bytes.NewReader(buf))
+	if err != nil {
+		return err
+	}
+	req = req.WithContext(ctx)
+
+	if s.apiKey != "" {
+		req.Header.Set("Authorization", "Bearer "+s.apiKey)
+	}
+	req.Header.Set("Content-Type", "application/json")
 	// TODO: Handle JSON errors.
-	return s.HTTPClient.Do(r)
+	resp, err := s.HTTPClient.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	return json.NewDecoder(resp.Body).Decode(output)
 }
 
 // Usage reports the API usage.
