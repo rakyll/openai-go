@@ -1,3 +1,4 @@
+// Package completion contains a client for OpenAI's completion API.
 package completion
 
 import (
@@ -11,6 +12,7 @@ import (
 
 const defaultEndpoint = "https://api.openai.com/v1/completions"
 
+// Client is a client to communicate with Open AI's completions API.
 type Client struct {
 	s     *openai.Session
 	model string
@@ -20,6 +22,8 @@ type Client struct {
 	Endpoint string
 }
 
+// NewClient creates a new default client that uses the given session
+// and defaults to the given model.
 func NewClient(session *openai.Session, model string) *Client {
 	return &Client{
 		s:        session,
@@ -28,6 +32,9 @@ func NewClient(session *openai.Session, model string) *Client {
 	}
 }
 
+// Parameters are completion parameters. Refer to OpenAI documentation
+// at https://platform.openai.com/docs/api-reference/completions/create
+// for reference.
 type Parameters struct {
 	Model  string   `json:"model,omitempty"`
 	Prompt []string `json:"prompt,omitempty"`
@@ -49,6 +56,9 @@ type Parameters struct {
 	BestOf           int     `json:"best_of,omitempty"`
 }
 
+// Response is a response to a completion. Refer to OpenAI documentation
+// at https://platform.openai.com/docs/api-reference/completions/create
+// for reference.
 type Response struct {
 	ID        string    `json:"id,omitempty"`
 	Object    string    `json:"object,omitempty"`
@@ -65,6 +75,7 @@ type Choice struct {
 	FinishReason string `json:"finish_reason,omitempty"`
 }
 
+// Complete creates a completion for the provided parameters.
 func (c *Client) Complete(ctx context.Context, p *Parameters) (*Response, error) {
 	if p.Model == "" {
 		p.Model = c.model

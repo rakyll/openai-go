@@ -6,6 +6,7 @@ import (
 	"time"
 )
 
+// Session is a session created to communicate with OpenAI.
 type Session struct {
 	apiKey string
 
@@ -14,6 +15,7 @@ type Session struct {
 	HTTPClient *http.Client
 }
 
+// NewSession creates a new session.
 func NewSession(apiKey string) *Session {
 	return &Session{
 		apiKey: apiKey,
@@ -23,14 +25,18 @@ func NewSession(apiKey string) *Session {
 	}
 }
 
+// MakeRequest makes HTTP requests and authenticates them with
+// session's API key.
 func (s *Session) MakeRequest(r *http.Request) (*http.Response, error) {
 	if s.apiKey != "" {
 		r.Header.Set("Authorization", "Bearer "+s.apiKey)
 	}
 	r.Header.Set("Content-Type", "application/json")
+	// TODO: Handle JSON errors.
 	return s.HTTPClient.Do(r)
 }
 
+// Usage reports the API usage.
 type Usage struct {
 	PromptTokens     int `json:"prompt_tokens,omitempty"`
 	CompletionTokens int `json:"completion_tokens,omitempty"`
