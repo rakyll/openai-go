@@ -70,7 +70,7 @@ func (c *Client) Complete(ctx context.Context, p *Parameters) (*Response, error)
 	if err != nil {
 		return nil, err
 	}
-	req, err := http.NewRequest("PUT", c.Endpoint, bytes.NewReader(buf))
+	req, err := http.NewRequest("POST", c.Endpoint, bytes.NewReader(buf))
 	if err != nil {
 		return nil, err
 	}
