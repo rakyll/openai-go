@@ -1,3 +1,4 @@
+// Package openai contains Go client libraries for OpenAI libraries.
 package openai
 
 import (
