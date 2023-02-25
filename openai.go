@@ -27,6 +27,7 @@ func (s *Session) MakeRequest(r *http.Request) (*http.Response, error) {
 	if s.apiKey != "" {
 		r.Header.Set("Authorization", "Bearer "+s.apiKey)
 	}
+	r.Header.Set("Content-Type", "application/json")
 	return s.HTTPClient.Do(r)
 }
 
