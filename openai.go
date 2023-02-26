@@ -12,6 +12,7 @@ import (
 // Session is a session created to communicate with OpenAI.
 type Session struct {
 	apiKey string
+	orgID  string
 
 	// HTTPClient providing a custom HTTP client.
 	// This field must be set before session is used.
@@ -19,9 +20,10 @@ type Session struct {
 }
 
 // NewSession creates a new session.
-func NewSession(apiKey string) *Session {
+func NewSession(apiKey string, orgID string) *Session {
 	return &Session{
 		apiKey: apiKey,
+		orgID:  orgID,
 		HTTPClient: &http.Client{
 			Timeout: 30 * time.Second,
 		},
@@ -45,6 +47,9 @@ func (s *Session) MakeRequest(ctx context.Context, endpoint string, input, outpu
 
 	if s.apiKey != "" {
 		req.Header.Set("Authorization", "Bearer "+s.apiKey)
+	}
+	if s.orgID != "" {
+		req.Header.Set("OpenAI-Organization", s.orgID)
 	}
 	req.Header.Set("Content-Type", "application/json")
 	// TODO: Handle JSON errors.
