@@ -21,7 +21,8 @@ type Session struct {
 	HTTPClient *http.Client
 }
 
-// NewSession creates a new session.
+// NewSession creates a new session. Organization IDs are optional,
+// use an empty string when you don't want to set one.
 func NewSession(apiKey string, orgID string) *Session {
 	return &Session{
 		apiKey: apiKey,
