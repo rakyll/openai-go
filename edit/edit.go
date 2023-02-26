@@ -18,6 +18,14 @@ type Client struct {
 	Endpoint string
 }
 
+func NewClient(session *openai.Session, model string) *Client {
+	return &Client{
+		s:        session,
+		model:    model,
+		Endpoint: defaultEndpoint,
+	}
+}
+
 // Parameters are completion parameters. Refer to OpenAI documentation
 // at https://platform.openai.com/docs/api-reference/edits/create
 // for reference.

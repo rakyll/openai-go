@@ -18,6 +18,14 @@ type Client struct {
 	Endpoint string
 }
 
+func NewClient(session *openai.Session, model string) *Client {
+	return &Client{
+		s:        session,
+		model:    model,
+		Endpoint: defaultEndpoint,
+	}
+}
+
 type Parameters struct {
 	Model string   `json:"model,omitempty"`
 	Input []string `json:"input,omitempty"`
