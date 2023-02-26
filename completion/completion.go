@@ -7,32 +7,32 @@ import (
 	"github.com/rakyll/openai-go"
 )
 
-const defaultEndpoint = "https://api.openai.com/v1/completions"
+const defaultCreateCompletionEndpoint = "https://api.openai.com/v1/completions"
 
 // Client is a client to communicate with Open AI's completions API.
 type Client struct {
 	s     *openai.Session
 	model string
 
-	// Endpoint allows overriding the default API endpoint.
+	// CreateCompletionEndpoint allows overriding the default API endpoint.
 	// Set this field before using the client.
-	Endpoint string
+	CreateCompletionEndpoint string
 }
 
 // NewClient creates a new default client that uses the given session
 // and defaults to the given model.
 func NewClient(session *openai.Session, model string) *Client {
 	return &Client{
-		s:        session,
-		model:    model,
-		Endpoint: defaultEndpoint,
+		s:                        session,
+		model:                    model,
+		CreateCompletionEndpoint: defaultCreateCompletionEndpoint,
 	}
 }
 
-// Parameters are completion parameters. Refer to OpenAI documentation
+// CreateCompletionParameters are completion parameters. Refer to OpenAI documentation
 // at https://platform.openai.com/docs/api-reference/completions/create
 // for reference.
-type Parameters struct {
+type CreateCompletionParameters struct {
 	Model  string   `json:"model,omitempty"`
 	Prompt []string `json:"prompt,omitempty"`
 	Stop   []string `json:"stop,omitempty"`
@@ -53,10 +53,10 @@ type Parameters struct {
 	BestOf           int     `json:"best_of,omitempty"`
 }
 
-// Response is a response to a completion. Refer to OpenAI documentation
+// CreateCompletionResponse is a response to a completion. Refer to OpenAI documentation
 // at https://platform.openai.com/docs/api-reference/completions/create
 // for reference.
-type Response struct {
+type CreateCompletionResponse struct {
 	ID        string    `json:"id,omitempty"`
 	Object    string    `json:"object,omitempty"`
 	CreatedAt int64     `json:"created_at,omitempty"`
@@ -72,14 +72,14 @@ type Choice struct {
 	FinishReason string `json:"finish_reason,omitempty"`
 }
 
-// Complete creates a completion for the provided parameters.
-func (c *Client) Complete(ctx context.Context, p *Parameters) (*Response, error) {
+// CreateCompletion creates a completion for the provided parameters.
+func (c *Client) CreateCompletion(ctx context.Context, p *CreateCompletionParameters) (*CreateCompletionResponse, error) {
 	if p.Model == "" {
 		p.Model = c.model
 	}
 
-	var r Response
-	if err := c.s.MakeRequest(ctx, c.Endpoint, p, &r); err != nil {
+	var r CreateCompletionResponse
+	if err := c.s.MakeRequest(ctx, c.CreateCompletionEndpoint, p, &r); err != nil {
 		return nil, err
 	}
 	return &r, nil

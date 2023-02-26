@@ -5,23 +5,23 @@ import (
 )
 
 const (
-	defaultCreateImageEndpoint = "https://api.openai.com/v1/images/generations"
+	defaultCreateEndpoint = "https://api.openai.com/v1/images/generations"
 )
 
 // Client is a client to communicate with Open AI's images API.
 type Client struct {
 	s *openai.Session
 
-	// CreateImageEndpoint allows overriding the default
+	// CreateEndpoint allows overriding the default
 	// for the image generation API endpoint.
 	// Set this field before using the client.
-	CreateImageEndpoint string
+	CreateEndpoint string
 }
 
 func NewClient(session *openai.Session) *Client {
 	return &Client{
-		s:                   session,
-		CreateImageEndpoint: defaultCreateImageEndpoint,
+		s:              session,
+		CreateEndpoint: defaultCreateEndpoint,
 	}
 }
 

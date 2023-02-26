@@ -13,23 +13,23 @@ type Client struct {
 	s     *openai.Session
 	model string
 
-	// Endpoint allows overriding the default API endpoint.
+	// CreateEditEndpoint allows overriding the default API endpoint.
 	// Set this field before using the client.
-	Endpoint string
+	CreateEditEndpoint string
 }
 
 func NewClient(session *openai.Session, model string) *Client {
 	return &Client{
-		s:        session,
-		model:    model,
-		Endpoint: defaultEndpoint,
+		s:                  session,
+		model:              model,
+		CreateEditEndpoint: defaultEndpoint,
 	}
 }
 
-// Parameters are completion parameters. Refer to OpenAI documentation
+// CreateEditParameters are completion parameters. Refer to OpenAI documentation
 // at https://platform.openai.com/docs/api-reference/edits/create
 // for reference.
-type Parameters struct {
+type CreateEditParameters struct {
 	Model       string `json:"model,omitempty"`
 	Input       string `json:"input,omitempty"`
 	Instruction string `json:"instruction,omitempty"`
@@ -39,10 +39,10 @@ type Parameters struct {
 	Temperature float64 `json:"temperature,omitempty"`
 }
 
-// Response is a response to a completion. Refer to OpenAI documentation
+// CreateEditResponse is a response to a completion. Refer to OpenAI documentation
 // at https://platform.openai.com/docs/api-reference/edits/create
 // for reference.
-type Response struct {
+type CreateEditResponse struct {
 	Object    string    `json:"object,omitempty"`
 	CreatedAt int64     `json:"created_at,omitempty"`
 	Choices   []*Choice `json:"choices,omitempty"`
@@ -55,13 +55,13 @@ type Choice struct {
 	Index int    `json:"index,omitempty"`
 }
 
-func (c *Client) Edit(ctx context.Context, p *Parameters) (*Response, error) {
+func (c *Client) CreateEdit(ctx context.Context, p *CreateEditParameters) (*CreateEditResponse, error) {
 	if p.Model == "" {
 		p.Model = c.model
 	}
 
-	var r Response
-	if err := c.s.MakeRequest(ctx, c.Endpoint, p, &r); err != nil {
+	var r CreateEditResponse
+	if err := c.s.MakeRequest(ctx, c.CreateEditEndpoint, p, &r); err != nil {
 		return nil, err
 	}
 	return &r, nil

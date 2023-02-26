@@ -17,7 +17,7 @@ type CreateResponse struct {
 
 func (c *Client) Create(ctx context.Context, p *CreateParameters) (*CreateResponse, error) {
 	var r CreateResponse
-	if err := c.s.MakeRequest(ctx, c.CreateImageEndpoint, p, &r); err != nil {
+	if err := c.s.MakeRequest(ctx, c.CreateEndpoint, p, &r); err != nil {
 		return nil, err
 	}
 	return &r, nil
