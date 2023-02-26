@@ -14,7 +14,7 @@ func main() {
 	s := openai.NewSession(os.Getenv("OPENAI_API_KEY"), "")
 
 	client := completion.NewClient(s, "text-davinci-003")
-	resp, err := client.CreateCompletion(ctx, &completion.CreateCompletionParameters{
+	resp, err := client.Create(ctx, &completion.CreateParameters{
 		N:         1,
 		MaxTokens: 200,
 		Prompt:    []string{"say this is a test"},

@@ -6,32 +6,32 @@ import (
 	"github.com/rakyll/openai-go"
 )
 
-const defaultCreateModerationEndpoint = "https://api.openai.com/v1/moderations"
+const defaultCreateEndpoint = "https://api.openai.com/v1/moderations"
 
 // Client is a client to communicate with Open AI's moderation API.
 type Client struct {
 	s     *openai.Session
 	model string
 
-	// CreateModerationEndpoint allows overriding the default API endpoint.
+	// CreateEndpoint allows overriding the default API endpoint.
 	// Set this field before using the client.
-	CreateModerationEndpoint string
+	CreateEndpoint string
 }
 
 func NewClient(session *openai.Session, model string) *Client {
 	return &Client{
-		s:                        session,
-		model:                    model,
-		CreateModerationEndpoint: defaultCreateModerationEndpoint,
+		s:              session,
+		model:          model,
+		CreateEndpoint: defaultCreateEndpoint,
 	}
 }
 
-type CreateModerationParameters struct {
+type CreateParameters struct {
 	Model string   `json:"model,omitempty"`
 	Input []string `json:"input,omitempty"`
 }
 
-type CreateModerationResponse struct {
+type CreateResponse struct {
 	ID      string    `json:"id,omitempty"`
 	Results []*Result `json:"results,omitempty"`
 }
@@ -42,13 +42,13 @@ type Result struct {
 	Flagged        bool               `json:"flagged,omitempty"`
 }
 
-func (c *Client) CreateModeration(ctx context.Context, p *CreateModerationParameters) (*CreateModerationResponse, error) {
+func (c *Client) Create(ctx context.Context, p *CreateParameters) (*CreateResponse, error) {
 	if p.Model == "" {
 		p.Model = c.model
 	}
 
-	var r CreateModerationResponse
-	if err := c.s.MakeRequest(ctx, c.CreateModerationEndpoint, p, &r); err != nil {
+	var r CreateResponse
+	if err := c.s.MakeRequest(ctx, c.CreateEndpoint, p, &r); err != nil {
 		return nil, err
 	}
 	return &r, nil
