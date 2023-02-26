@@ -17,6 +17,7 @@ func main() {
 	resp, err := client.Create(ctx, &image.CreateParameters{
 		N:      3,
 		Prompt: "a cute baby",
+		Size:   "1024x1024",
 	})
 	if err != nil {
 		log.Fatalf("Failed to generate image: %v", err)
