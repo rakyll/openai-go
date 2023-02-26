@@ -1,3 +1,4 @@
+// Package moderation contains a client for OpenAI's moderations API.
 package moderation
 
 import (

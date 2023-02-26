@@ -1,3 +1,4 @@
+// Package image contains a client for OpenAI's images API.
 package image
 
 import "context"

@@ -1,3 +1,4 @@
+// Package edit contains a client for OpenAI's edits API.
 package edit
 
 import (
