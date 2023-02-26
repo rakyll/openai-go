@@ -2,7 +2,7 @@ package image
 
 import "context"
 
-type GenerateParameters struct {
+type CreateParameters struct {
 	Prompt string `json:"prompt,omitempty"`
 	N      int    `json:"n,omitempty"`
 	Size   string `json:"size,omitempty"`
@@ -10,14 +10,14 @@ type GenerateParameters struct {
 	User   string `json:"user,omitempty"`
 }
 
-type GenerateResponse struct {
+type CreateResponse struct {
 	CreatedAt int64    `json:"created_at,omitempty"`
 	Data      []*Image `json:"data,omitempty"`
 }
 
-func (c *Client) Generate(ctx context.Context, p *GenerateParameters) (*GenerateResponse, error) {
-	var r GenerateResponse
-	if err := c.s.MakeRequest(ctx, c.GenerationEndpoint, p, &r); err != nil {
+func (c *Client) Create(ctx context.Context, p *CreateParameters) (*CreateResponse, error) {
+	var r CreateResponse
+	if err := c.s.MakeRequest(ctx, c.CreateImageEndpoint, p, &r); err != nil {
 		return nil, err
 	}
 	return &r, nil

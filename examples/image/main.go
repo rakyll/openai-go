@@ -14,7 +14,7 @@ func main() {
 	s := openai.NewSession(os.Getenv("OPENAI_API_KEY"), "")
 
 	client := image.NewClient(s)
-	resp, err := client.Generate(ctx, &image.GenerateParameters{
+	resp, err := client.Create(ctx, &image.CreateParameters{
 		N:      3,
 		Prompt: "a cute baby",
 	})
