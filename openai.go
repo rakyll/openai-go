@@ -5,6 +5,8 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"fmt"
+	"io/ioutil"
 	"net/http"
 	"time"
 )
@@ -52,14 +54,35 @@ func (s *Session) MakeRequest(ctx context.Context, endpoint string, input, outpu
 		req.Header.Set("OpenAI-Organization", s.orgID)
 	}
 	req.Header.Set("Content-Type", "application/json")
-	// TODO: Handle JSON errors.
+
 	resp, err := s.HTTPClient.Do(req)
 	if err != nil {
 		return err
 	}
 	defer resp.Body.Close()
 
-	return json.NewDecoder(resp.Body).Decode(output)
+	respBody, err := ioutil.ReadAll(req.Body)
+	if err != nil {
+		return err
+	}
+	if resp.StatusCode < 200 || resp.StatusCode >= 400 {
+		return &APIError{
+			StatusCode: resp.StatusCode,
+			Payload:    respBody,
+		}
+	}
+	return json.Unmarshal(respBody, output)
+}
+
+// APIError is returned from API requests if the API
+// responds with an error.
+type APIError struct {
+	StatusCode int
+	Payload    []byte
+}
+
+func (e *APIError) Error() string {
+	return fmt.Sprintf("status_code=%d, payload=%s", e.StatusCode, e.Payload)
 }
 
 // Usage reports the API usage.
