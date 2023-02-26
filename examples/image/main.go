@@ -15,7 +15,7 @@ func main() {
 
 	client := image.NewClient(s)
 	resp, err := client.Generate(ctx, &image.GenerateParameters{
-		N:      1,
+		N:      3,
 		Prompt: "a cute baby",
 	})
 	if err != nil {
