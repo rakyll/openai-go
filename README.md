@@ -4,6 +4,7 @@ Go client libraries for OpenAI APIs. Supported APIs:
 ```
 ✅ completions
 ✅ edits
+🚧 images
 ✅ moderations
 ```
 
