@@ -61,17 +61,17 @@ func (s *Session) MakeRequest(ctx context.Context, endpoint string, input, outpu
 	}
 	defer resp.Body.Close()
 
-	respBody, err := ioutil.ReadAll(req.Body)
-	if err != nil {
-		return err
-	}
 	if resp.StatusCode < 200 || resp.StatusCode >= 400 {
+		respBody, err := ioutil.ReadAll(req.Body)
+		if err != nil {
+			return err
+		}
 		return &APIError{
 			StatusCode: resp.StatusCode,
 			Payload:    respBody,
 		}
 	}
-	return json.Unmarshal(respBody, output)
+	return json.NewDecoder(resp.Body).Decode(output)
 }
 
 // APIError is returned from API requests if the API
