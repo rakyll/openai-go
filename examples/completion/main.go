@@ -11,7 +11,7 @@ import (
 
 func main() {
 	ctx := context.Background()
-	s := openai.NewSession(os.Getenv("OPENAI_API_KEY"), "")
+	s := openai.NewSession(os.Getenv("OPENAI_API_KEY"))
 
 	client := completion.NewClient(s, "text-davinci-003")
 	resp, err := client.Create(ctx, &completion.CreateParameters{

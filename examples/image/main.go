@@ -11,7 +11,7 @@ import (
 
 func main() {
 	ctx := context.Background()
-	s := openai.NewSession(os.Getenv("OPENAI_API_KEY"), "")
+	s := openai.NewSession(os.Getenv("OPENAI_API_KEY"))
 
 	client := image.NewClient(s)
 	resp, err := client.Create(ctx, &image.CreateParameters{
