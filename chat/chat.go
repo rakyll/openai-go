@@ -1,3 +1,4 @@
+// Package chat contains a client for Open AI's ChatGPT APIs.
 package chat
 
 import (
@@ -8,7 +9,7 @@ import (
 
 const defaultCreateCompletionsEndpoint = "https://api.openai.com/v1/chat/completions"
 
-// Client is a client to communicate with Open AI's chat API.
+// Client is a client to communicate with Open AI's ChatGPT APIs.
 type Client struct {
 	s     *openai.Session
 	model string
