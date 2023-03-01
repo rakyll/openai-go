@@ -1,0 +1,82 @@
+package chat
+
+import (
+	"context"
+
+	"github.com/rakyll/openai-go"
+)
+
+const defaultCreateCompletionsEndpoint = "https://api.openai.com/v1/chat/completions"
+
+// Client is a client to communicate with Open AI's chat API.
+type Client struct {
+	s     *openai.Session
+	model string
+
+	// CreateCompletionsEndpoint allows overriding the default API endpoint.
+	// Set this field before using the client.
+	CreateCompletionEndpoint string
+}
+
+// NewClient creates a new default client that uses the given session
+// and defaults to the given model.
+func NewClient(session *openai.Session, model string) *Client {
+	if model == "" {
+		model = "gpt-3.5-turbo"
+	}
+	return &Client{
+		s:                        session,
+		model:                    model,
+		CreateCompletionEndpoint: defaultCreateCompletionsEndpoint,
+	}
+}
+
+type CreateCompletionParameters struct {
+	Model    string     `json:"model,omitempty"`
+	Messages []*Message `json:"messages,omitempty"`
+	Stop     []string   `json:"stop,omitempty"`
+	User     string     `json:"user,omitempty"`
+
+	N           int     `json:"n,omitempty"`
+	TopP        float64 `json:"top_n,omitempty"`
+	Temperature float64 `json:"temperature,omitempty"`
+	MaxTokens   int     `json:"max_tokens,omitempty"`
+
+	Stream bool `json:"stream,omitempty"`
+
+	PresencePenalty  float64 `json:"presence_penalty,omitempty"`
+	FrequencyPenalty float64 `json:"frequency_penalty,omitempty"`
+}
+
+type CreateCompletionResponse struct {
+	ID        string    `json:"id,omitempty"`
+	Object    string    `json:"object,omitempty"`
+	CreatedAt int64     `json:"created_at,omitempty"`
+	Choices   []*Choice `json:"choices,omitempty"`
+
+	Usage *openai.Usage `json:"usage,omitempty"`
+}
+
+type Choice struct {
+	Message      *Message `json:"message,omitempty"`
+	Index        int      `json:"index,omitempty"`
+	LogProbs     int      `json:"logprobs,omitempty"`
+	FinishReason string   `json:"finish_reason,omitempty"`
+}
+
+type Message struct {
+	Role    string `json:"role,omitempty"`
+	Content string `json:"content,omitempty"`
+}
+
+func (c *Client) CreateCompletion(ctx context.Context, p *CreateCompletionParameters) (*CreateCompletionResponse, error) {
+	if p.Model == "" {
+		p.Model = c.model
+	}
+
+	var r CreateCompletionResponse
+	if err := c.s.MakeRequest(ctx, c.CreateCompletionEndpoint, p, &r); err != nil {
+		return nil, err
+	}
+	return &r, nil
+}
