@@ -27,7 +27,7 @@ func NewClient(session *openai.Session, model string) *Client {
 	}
 }
 
-type CreateParameters struct {
+type CreateParams struct {
 	Model string   `json:"model,omitempty"`
 	Input []string `json:"input,omitempty"`
 }
@@ -43,7 +43,7 @@ type Result struct {
 	Flagged        bool               `json:"flagged,omitempty"`
 }
 
-func (c *Client) Create(ctx context.Context, p *CreateParameters) (*CreateResponse, error) {
+func (c *Client) Create(ctx context.Context, p *CreateParams) (*CreateResponse, error) {
 	if p.Model == "" {
 		p.Model = c.model
 	}

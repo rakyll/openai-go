@@ -27,10 +27,10 @@ func NewClient(session *openai.Session, model string) *Client {
 	}
 }
 
-// CreateParameters are completion parameters. Refer to OpenAI documentation
+// CreateParams are completion parameters. Refer to OpenAI documentation
 // at https://platform.openai.com/docs/api-reference/edits/create
 // for reference.
-type CreateParameters struct {
+type CreateParams struct {
 	Model       string `json:"model,omitempty"`
 	Input       string `json:"input,omitempty"`
 	Instruction string `json:"instruction,omitempty"`
@@ -56,7 +56,7 @@ type Choice struct {
 	Index int    `json:"index,omitempty"`
 }
 
-func (c *Client) Create(ctx context.Context, p *CreateParameters) (*CreateResponse, error) {
+func (c *Client) Create(ctx context.Context, p *CreateParams) (*CreateResponse, error) {
 	if p.Model == "" {
 		p.Model = c.model
 	}

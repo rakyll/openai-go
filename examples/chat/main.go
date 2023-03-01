@@ -14,7 +14,7 @@ func main() {
 	s := openai.NewSession(os.Getenv("OPENAI_API_KEY"))
 
 	client := chat.NewClient(s, "gpt-3.5-turbo")
-	resp, err := client.CreateCompletion(ctx, &chat.CreateCompletionParameters{
+	resp, err := client.CreateCompletion(ctx, &chat.CreateCompletionParams{
 		Messages: []*chat.Message{
 			{Role: "user", Content: "hello"},
 		},

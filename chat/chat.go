@@ -31,7 +31,7 @@ func NewClient(session *openai.Session, model string) *Client {
 	}
 }
 
-type CreateCompletionParameters struct {
+type CreateCompletionParams struct {
 	Model    string     `json:"model,omitempty"`
 	Messages []*Message `json:"messages,omitempty"`
 	Stop     []string   `json:"stop,omitempty"`
@@ -69,7 +69,7 @@ type Message struct {
 	Content string `json:"content,omitempty"`
 }
 
-func (c *Client) CreateCompletion(ctx context.Context, p *CreateCompletionParameters) (*CreateCompletionResponse, error) {
+func (c *Client) CreateCompletion(ctx context.Context, p *CreateCompletionParams) (*CreateCompletionResponse, error) {
 	if p.Model == "" {
 		p.Model = c.model
 	}
