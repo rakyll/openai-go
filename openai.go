@@ -6,8 +6,10 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
+	"mime/multipart"
 	"net/http"
+	"net/url"
 	"time"
 )
 
@@ -45,11 +47,10 @@ func (s *Session) MakeRequest(ctx context.Context, endpoint string, input, outpu
 		return err
 	}
 
-	req, err := http.NewRequest("POST", endpoint, bytes.NewReader(buf))
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, endpoint, bytes.NewReader(buf))
 	if err != nil {
 		return err
 	}
-	req = req.WithContext(ctx)
 
 	if s.apiKey != "" {
 		req.Header.Set("Authorization", "Bearer "+s.apiKey)
@@ -66,7 +67,7 @@ func (s *Session) MakeRequest(ctx context.Context, endpoint string, input, outpu
 	defer resp.Body.Close()
 
 	if resp.StatusCode < 200 || resp.StatusCode >= 400 {
-		respBody, err := ioutil.ReadAll(resp.Body)
+		respBody, err := io.ReadAll(resp.Body)
 		if err != nil {
 			return err
 		}
@@ -76,6 +77,71 @@ func (s *Session) MakeRequest(ctx context.Context, endpoint string, input, outpu
 		}
 	}
 	return json.NewDecoder(resp.Body).Decode(output)
+}
+
+// Upload makes a multi-part form data upload them with
+// session's API key. Upload combines the file with the given params
+// and unmarshals the response as output.
+func (s *Session) Upload(ctx context.Context, endpoint string, file io.Reader, fileExt string, params url.Values, output interface{}) error {
+	pr, pw := io.Pipe()
+	mw := multipart.NewWriter(pw)
+	go func() {
+		err := upload(mw, file, fileExt, params)
+		pw.CloseWithError(err)
+	}()
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, endpoint, pr)
+	if err != nil {
+		return err
+	}
+	if s.apiKey != "" {
+		req.Header.Set("Authorization", "Bearer "+s.apiKey)
+	}
+	if s.OrganizationID != "" {
+		req.Header.Set("OpenAI-Organization", s.OrganizationID)
+	}
+	req.Header.Set("Content-Type", mw.FormDataContentType())
+	resp, err := s.HTTPClient.Do(req)
+	if err != nil {
+		return fmt.Errorf("error sending request: %w", err)
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode < 200 || resp.StatusCode >= 400 {
+		respBody, err := io.ReadAll(req.Body)
+		if err != nil {
+			return fmt.Errorf("error reading response body: %w", err)
+		}
+		return &APIError{
+			StatusCode: resp.StatusCode,
+			Payload:    respBody,
+		}
+	}
+	return json.NewDecoder(resp.Body).Decode(output)
+}
+
+func upload(mw *multipart.Writer, file io.Reader, fileExt string, params url.Values) error {
+	for key := range params {
+		w, err := mw.CreateFormField(key)
+		if err != nil {
+			return fmt.Errorf("error creating %q field: %w", key, err)
+		}
+		_, err = fmt.Fprint(w, params.Get(key))
+		if err != nil {
+			return fmt.Errorf("error writing %q field: %w", key, err)
+		}
+	}
+	w, err := mw.CreateFormFile("file", "audio."+fileExt)
+	if err != nil {
+		return fmt.Errorf("error creating file: %w", err)
+	}
+	_, err = io.Copy(w, file)
+	if err != nil {
+		return fmt.Errorf("error copying file: %w", err)
+	}
+	err = mw.Close()
+	if err != nil {
+		return fmt.Errorf("error closing multipart writer: %w", err)
+	}
+	return nil
 }
 
 // APIError is returned from API requests if the API
