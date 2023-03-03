@@ -66,7 +66,7 @@ func (s *Session) MakeRequest(ctx context.Context, endpoint string, input, outpu
 	defer resp.Body.Close()
 
 	if resp.StatusCode < 200 || resp.StatusCode >= 400 {
-		respBody, err := ioutil.ReadAll(req.Body)
+		respBody, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
 			return err
 		}
