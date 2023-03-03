@@ -26,5 +26,6 @@ func NewClient(session *openai.Session) *Client {
 }
 
 type Image struct {
-	URL string `json:"url,omitempty"`
+	URL        string `json:"url,omitempty"`
+	Base64JSON string `json:"b64_json,omitempty"`
 }
