@@ -33,20 +33,21 @@ func NewClient(session *openai.Session, model string) *Client {
 }
 
 type CreateCompletionParams struct {
-	Model    string     `json:"model,omitempty"`
+	Model string `json:"model,omitempty"`
+
 	Messages []*Message `json:"messages,omitempty"`
 	Stop     []string   `json:"stop,omitempty"`
-	User     string     `json:"user,omitempty"`
+	Stream   bool       `json:"stream,omitempty"`
 
 	N           int     `json:"n,omitempty"`
 	TopP        float64 `json:"top_n,omitempty"`
 	Temperature float64 `json:"temperature,omitempty"`
 	MaxTokens   int     `json:"max_tokens,omitempty"`
 
-	Stream bool `json:"stream,omitempty"`
-
 	PresencePenalty  float64 `json:"presence_penalty,omitempty"`
 	FrequencyPenalty float64 `json:"frequency_penalty,omitempty"`
+
+	User string `json:"user,omitempty"`
 }
 
 type CreateCompletionResponse struct {

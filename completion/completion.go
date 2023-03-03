@@ -33,24 +33,25 @@ func NewClient(session *openai.Session, model string) *Client {
 // at https://platform.openai.com/docs/api-reference/completions/create
 // for reference.
 type CreateParams struct {
-	Model  string   `json:"model,omitempty"`
+	Model string `json:"model,omitempty"`
+
 	Prompt []string `json:"prompt,omitempty"`
 	Stop   []string `json:"stop,omitempty"`
 	Suffix string   `json:"suffix,omitempty"`
-	User   string   `json:"user,omitempty"`
+	Stream bool     `json:"stream,omitempty"`
+	Echo   bool     `json:"echo,omitempty"`
 
 	MaxTokens   int     `json:"max_tokens,omitempty"`
 	N           int     `json:"n,omitempty"`
 	TopP        float64 `json:"top_n,omitempty"`
 	Temperature float64 `json:"temperature,omitempty"`
 
-	Stream bool `json:"stream,omitempty"`
-	Echo   bool `json:"echo,omitempty"`
-
 	LogProbs         int     `json:"logprobs,omitempty"`
 	PresencePenalty  float64 `json:"presence_penalty,omitempty"`
 	FrequencyPenalty float64 `json:"frequency_penalty,omitempty"`
 	BestOf           int     `json:"best_of,omitempty"`
+
+	User string `json:"user,omitempty"`
 }
 
 // CreateResponse is a response to a completion. Refer to OpenAI documentation
