@@ -7,6 +7,7 @@ Go client libraries for OpenAI APIs. Supported APIs:
 ✅ edits
 🚧 images
 ✅ moderations
+✅ whisper
 ```
 
 Set your [API key](https://platform.openai.com/account/api-keys)
