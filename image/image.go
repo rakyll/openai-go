@@ -1,6 +1,13 @@
 package image
 
 import (
+	"bytes"
+	"encoding/base64"
+	"errors"
+	"io"
+	"io/ioutil"
+	"net/http"
+
 	"github.com/rakyll/openai-go"
 )
 
@@ -28,4 +35,22 @@ func NewClient(session *openai.Session) *Client {
 type Image struct {
 	URL        string `json:"url,omitempty"`
 	Base64JSON string `json:"b64_json,omitempty"`
+}
+
+func (i *Image) Reader() (io.ReadCloser, error) {
+	if i.URL != "" {
+		resp, err := http.Get(i.URL)
+		if err != nil {
+			return nil, err
+		}
+		return resp.Body, nil
+	}
+	if i.Base64JSON != "" {
+		decoded, err := base64.StdEncoding.DecodeString(i.Base64JSON)
+		if err != nil {
+			return nil, err
+		}
+		return ioutil.NopCloser(bytes.NewBuffer(decoded)), nil
+	}
+	return nil, errors.New("no image data")
 }
