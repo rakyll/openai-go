@@ -55,8 +55,8 @@ func (s *Session) MakeRequest(ctx context.Context, endpoint string, input, outpu
 	if err != nil {
 		return err
 	}
-
-	return s.sendRequest(req, "application/json", output)
+	s.setHeaders(req, "application/json")
+	return s.sendRequest(req, output)
 }
 
 // Upload makes a multi-part form data upload them with
@@ -73,10 +73,11 @@ func (s *Session) Upload(ctx context.Context, endpoint string, file io.Reader, f
 	if err != nil {
 		return err
 	}
-	return s.sendRequest(req, mw.FormDataContentType(), output)
+	s.setHeaders(req, mw.FormDataContentType())
+	return s.sendRequest(req, output)
 }
 
-func (s *Session) sendRequest(req *http.Request, contentType string, output any) error {
+func (s *Session) setHeaders(req *http.Request, contentType string) {
 	if s.apiKey != "" {
 		req.Header.Set("Authorization", "Bearer "+s.apiKey)
 	}
@@ -84,7 +85,9 @@ func (s *Session) sendRequest(req *http.Request, contentType string, output any)
 		req.Header.Set("OpenAI-Organization", s.OrganizationID)
 	}
 	req.Header.Set("Content-Type", contentType)
+}
 
+func (s *Session) sendRequest(req *http.Request, output any) error {
 	resp, err := s.HTTPClient.Do(req)
 	if err != nil {
 		return err
