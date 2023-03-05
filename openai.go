@@ -42,6 +42,10 @@ func NewSession(apiKey string) *Session {
 // session's API key. MakeRequest marshals input as the request body,
 // and unmarshals the response as output.
 func (s *Session) MakeRequest(ctx context.Context, endpoint string, input, output any) error {
+	if input == nil {
+		return fmt.Errorf("params cannot be nil")
+	}
+
 	buf, err := json.Marshal(input)
 	if err != nil {
 		return err
@@ -97,6 +101,7 @@ func (s *Session) sendRequest(req *http.Request, contentType string, output any)
 			Payload:    respBody,
 		}
 	}
+
 	return json.NewDecoder(resp.Body).Decode(output)
 }
 
