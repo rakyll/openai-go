@@ -6,12 +6,14 @@ import (
 	"os"
 
 	"github.com/rakyll/openai-go"
-	"github.com/rakyll/openai-go/whisper"
+	"github.com/rakyll/openai-go/audio"
 )
 
 func main() {
-	sesh := openai.NewSession(os.Getenv("OPENAI_API_KEY"))
-	wc := whisper.NewClient(sesh, "")
+	ctx := context.Background()
+
+	s := openai.NewSession(os.Getenv("OPENAI_API_KEY"))
+	client := audio.NewClient(s, "")
 	filePath := os.Getenv("AUDIO_FILE_PATH")
 	if filePath == "" {
 		log.Fatal("must provide an AUDIO_FILE_PATH env var")
@@ -21,7 +23,7 @@ func main() {
 		log.Fatalf("error opening audio file: %v", err)
 	}
 	defer f.Close()
-	resp, err := wc.Transcribe(context.TODO(), &whisper.CreateCompletionParams{
+	resp, err := client.CreateTranscription(ctx, &audio.CreateTranscriptionParams{
 		Language:    "en",
 		Audio:       f,
 		AudioFormat: "mp3",
