@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"io/ioutil"
 	"log"
 	"os"
 
@@ -18,12 +19,21 @@ func main() {
 		N:      3,
 		Prompt: "a cute baby",
 		Size:   "1024x1024",
+		Format: "b64_json",
 	})
 	if err != nil {
 		log.Fatalf("Failed to generate image: %v", err)
 	}
 
 	for _, image := range resp.Data {
-		log.Println(image.URL)
+		reader, err := image.Reader()
+		if err != nil {
+			log.Fatalf("Failed to read image data: %v", err)
+		}
+		data, err := ioutil.ReadAll(reader)
+		if err != nil {
+			log.Fatalf("ReadAll error: %v", err)
+		}
+		log.Println(string(data[1:4]))
 	}
 }
