@@ -88,6 +88,7 @@ func (s *Session) setHeaders(req *http.Request, contentType string) {
 	}
 	req.Header.Set("Content-Type", contentType)
 	req.Header.Add("User-Agent", userAgent)
+}
 
 func (s *Session) sendRequest(req *http.Request, output any) error {
 	resp, err := s.HTTPClient.Do(req)
