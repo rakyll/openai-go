@@ -2,6 +2,7 @@
 package openai
 
 import (
+	"bufio"
 	"bytes"
 	"context"
 	"encoding/json"
@@ -10,6 +11,7 @@ import (
 	"mime/multipart"
 	"net/http"
 	"net/url"
+	"strings"
 	"time"
 )
 
@@ -54,7 +56,52 @@ func (s *Session) MakeRequest(ctx context.Context, endpoint string, input, outpu
 		return err
 	}
 
-	return s.sendRequest(req, "application/json", output)
+	body, err := s.sendRequest(req, "application/json")
+	if err != nil {
+		return err
+	}
+	defer body.Close()
+
+	return json.NewDecoder(body).Decode(output)
+}
+
+func (s *Session) MakeStreamingRequest(ctx context.Context, endpoint string, input interface{}, output interface{}, fn func(any)) error {
+	const (
+		streamPrefix = "data: "
+		streamEnd    = "[DONE]"
+	)
+
+	buf, err := json.Marshal(input)
+	if err != nil {
+		return err
+	}
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, endpoint, bytes.NewReader(buf))
+	if err != nil {
+		return err
+	}
+
+	body, err := s.sendRequest(req, "application/json")
+	if err != nil {
+		return err
+	}
+	defer body.Close()
+
+	scanner := bufio.NewScanner(body)
+	for scanner.Scan() {
+		line := strings.Replace(scanner.Text(), streamPrefix, "", 1)
+		if line == "" {
+			continue
+		}
+		if line == streamEnd {
+			return nil
+		}
+		if err := json.Unmarshal([]byte(line), output); err != nil {
+			return fmt.Errorf("failed to unmarshal streaming response: %w", err)
+		}
+		fn(output)
+	}
+	return scanner.Err()
 }
 
 // Upload makes a multi-part form data upload them with
@@ -71,10 +118,16 @@ func (s *Session) Upload(ctx context.Context, endpoint string, file io.Reader, f
 	if err != nil {
 		return err
 	}
-	return s.sendRequest(req, mw.FormDataContentType(), output)
+	body, err := s.sendRequest(req, mw.FormDataContentType())
+	if err != nil {
+		return err
+	}
+	defer body.Close()
+
+	return json.NewDecoder(body).Decode(output)
 }
 
-func (s *Session) sendRequest(req *http.Request, contentType string, output any) error {
+func (s *Session) sendRequest(req *http.Request, contentType string) (io.ReadCloser, error) {
 	if s.apiKey != "" {
 		req.Header.Set("Authorization", "Bearer "+s.apiKey)
 	}
@@ -86,21 +139,20 @@ func (s *Session) sendRequest(req *http.Request, contentType string, output any)
 
 	resp, err := s.HTTPClient.Do(req)
 	if err != nil {
-		return err
+		return nil, fmt.Errorf("error making request: %w", err)
 	}
-	defer resp.Body.Close()
 
 	if resp.StatusCode < 200 || resp.StatusCode >= 400 {
 		respBody, err := io.ReadAll(resp.Body)
 		if err != nil {
-			return err
+			return nil, err
 		}
-		return &APIError{
+		return nil, &APIError{
 			StatusCode: resp.StatusCode,
 			Payload:    respBody,
 		}
 	}
-	return json.NewDecoder(resp.Body).Decode(output)
+	return resp.Body, nil
 }
 
 func upload(mw *multipart.Writer, file io.Reader, fileExt string, params url.Values) error {
