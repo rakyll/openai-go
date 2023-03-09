@@ -13,6 +13,8 @@ import (
 	"time"
 )
 
+const userAgent = "openai-go/1"
+
 // Session is a session created to communicate with OpenAI.
 type Session struct {
 	// OrganizationID is the ID optionally to be included as
@@ -80,6 +82,7 @@ func (s *Session) sendRequest(req *http.Request, contentType string, output any)
 		req.Header.Set("OpenAI-Organization", s.OrganizationID)
 	}
 	req.Header.Set("Content-Type", contentType)
+	req.Header.Add("User-Agent", userAgent)
 
 	resp, err := s.HTTPClient.Do(req)
 	if err != nil {
