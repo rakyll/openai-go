@@ -65,7 +65,7 @@ func (s *Session) MakeRequest(ctx context.Context, endpoint string, input, outpu
 	return json.NewDecoder(body).Decode(output)
 }
 
-func (s *Session) MakeStreamingRequest(ctx context.Context, endpoint string, input interface{}, output interface{}, fn func(any)) error {
+func (s *Session) MakeStreamingRequest(ctx context.Context, endpoint string, input any, output any, fn func(any)) error {
 	const (
 		streamPrefix = "data: "
 		streamEnd    = "[DONE]"
