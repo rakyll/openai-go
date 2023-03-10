@@ -3,6 +3,7 @@ package completion
 
 import (
 	"context"
+	"errors"
 
 	"github.com/rakyll/openai-go"
 )
@@ -77,6 +78,9 @@ type Choice struct {
 func (c *Client) Create(ctx context.Context, p *CreateParams) (*CreateResponse, error) {
 	if p.Model == "" {
 		p.Model = c.model
+	}
+	if p.Stream {
+		return nil, errors.New("use StreamingClient instead")
 	}
 
 	var r CreateResponse

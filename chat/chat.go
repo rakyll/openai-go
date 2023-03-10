@@ -3,9 +3,12 @@ package chat
 
 import (
 	"context"
+	"errors"
 
 	"github.com/rakyll/openai-go"
 )
+
+const defaultModel = "gpt-3.5-turbo"
 
 const defaultCreateCompletionsEndpoint = "https://api.openai.com/v1/chat/completions"
 
@@ -23,7 +26,7 @@ type Client struct {
 // and defaults to the given model.
 func NewClient(session *openai.Session, model string) *Client {
 	if model == "" {
-		model = "gpt-3.5-turbo"
+		model = defaultModel
 	}
 	return &Client{
 		s:                        session,
@@ -74,6 +77,9 @@ type Message struct {
 func (c *Client) CreateCompletion(ctx context.Context, p *CreateCompletionParams) (*CreateCompletionResponse, error) {
 	if p.Model == "" {
 		p.Model = c.model
+	}
+	if p.Stream {
+		return nil, errors.New("use StreamingClient instead")
 	}
 
 	var r CreateCompletionResponse
