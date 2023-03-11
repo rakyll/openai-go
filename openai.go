@@ -46,23 +46,23 @@ func NewSession(apiKey string) *Session {
 // session's API key. MakeRequest marshals input as the request body,
 // and unmarshals the response as output.
 func (s *Session) MakeRequest(ctx context.Context, endpoint string, input, output any) error {
-	buf, err := json.Marshal(input)
+	reqBody, err := json.Marshal(input)
 	if err != nil {
 		return err
 	}
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, endpoint, bytes.NewReader(buf))
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, endpoint, bytes.NewReader(reqBody))
 	if err != nil {
 		return err
 	}
 
-	body, err := s.sendRequest(req, "application/json")
+	respBody, err := s.makeRequest(req, "application/json")
 	if err != nil {
 		return err
 	}
-	defer body.Close()
+	defer respBody.Close()
 
-	return json.NewDecoder(body).Decode(output)
+	return json.NewDecoder(respBody).Decode(output)
 }
 
 func (s *Session) MakeStreamingRequest(ctx context.Context, endpoint string, input any, output any, fn func(any)) error {
@@ -81,13 +81,13 @@ func (s *Session) MakeStreamingRequest(ctx context.Context, endpoint string, inp
 		return err
 	}
 
-	body, err := s.sendRequest(req, "application/json")
+	respBody, err := s.makeRequest(req, "application/json")
 	if err != nil {
 		return err
 	}
-	defer body.Close()
+	defer respBody.Close()
 
-	scanner := bufio.NewScanner(body)
+	scanner := bufio.NewScanner(respBody)
 	for scanner.Scan() {
 		line := strings.Replace(scanner.Text(), streamPrefix, "", 1)
 		if line == "" {
@@ -118,16 +118,16 @@ func (s *Session) Upload(ctx context.Context, endpoint string, file io.Reader, f
 	if err != nil {
 		return err
 	}
-	body, err := s.sendRequest(req, mw.FormDataContentType())
+	respBody, err := s.makeRequest(req, mw.FormDataContentType())
 	if err != nil {
 		return err
 	}
-	defer body.Close()
+	defer respBody.Close()
 
-	return json.NewDecoder(body).Decode(output)
+	return json.NewDecoder(respBody).Decode(output)
 }
 
-func (s *Session) sendRequest(req *http.Request, contentType string) (io.ReadCloser, error) {
+func (s *Session) makeRequest(req *http.Request, contentType string) (io.ReadCloser, error) {
 	if s.apiKey != "" {
 		req.Header.Set("Authorization", "Bearer "+s.apiKey)
 	}
@@ -161,8 +161,7 @@ func upload(mw *multipart.Writer, file io.Reader, fileExt string, params url.Val
 		if err != nil {
 			return fmt.Errorf("error creating %q field: %w", key, err)
 		}
-		_, err = fmt.Fprint(w, params.Get(key))
-		if err != nil {
+		if _, err := fmt.Fprint(w, params.Get(key)); err != nil {
 			return fmt.Errorf("error writing %q field: %w", key, err)
 		}
 	}
@@ -170,12 +169,10 @@ func upload(mw *multipart.Writer, file io.Reader, fileExt string, params url.Val
 	if err != nil {
 		return fmt.Errorf("error creating file: %w", err)
 	}
-	_, err = io.Copy(w, file)
-	if err != nil {
+	if _, err := io.Copy(w, file); err != nil {
 		return fmt.Errorf("error copying file: %w", err)
 	}
-	err = mw.Close()
-	if err != nil {
+	if err := mw.Close(); err != nil {
 		return fmt.Errorf("error closing multipart writer: %w", err)
 	}
 	return nil
