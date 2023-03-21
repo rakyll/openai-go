@@ -8,6 +8,7 @@ Go client libraries for OpenAI APIs. Supported APIs:
 🚧 images
 ✅ moderations
 ✅ audio
+✅ embeddings
 ```
 
 Set your [API key](https://platform.openai.com/account/api-keys)
