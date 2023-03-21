@@ -37,10 +37,14 @@ func NewClient(session *openai.Session, model string) *Client {
 }
 
 type CreateTranscriptionParams struct {
-	Model       string
-	Language    string
+	Model    string
+	Language string
+
 	Audio       io.Reader
 	AudioFormat string // such as "mp3" or "wav", etc.
+
+	Prompt string // optional
+	// TODO: Add temperature.
 }
 
 type CreateTranscriptionResponse struct {
@@ -58,6 +62,9 @@ func (c *Client) CreateTranscription(ctx context.Context, p *CreateTranscription
 	params.Set("model", p.Model)
 	if p.Language != "" {
 		params.Set("language", p.Language)
+	}
+	if p.Prompt != "" {
+		params.Set("prompt", p.Prompt)
 	}
 	var r CreateTranscriptionResponse
 	return &r, c.s.Upload(ctx, c.CreateTranscriptionEndpoint, p.Audio, p.AudioFormat, params, &r)
