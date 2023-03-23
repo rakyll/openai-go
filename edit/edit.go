@@ -36,7 +36,7 @@ type CreateParams struct {
 	Instruction string `json:"instruction,omitempty"`
 
 	N           int     `json:"n,omitempty"`
-	TopP        float64 `json:"top_n,omitempty"`
+	TopP        float64 `json:"top_p,omitempty"`
 	Temperature float64 `json:"temperature,omitempty"`
 }
 
