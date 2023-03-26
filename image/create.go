@@ -15,8 +15,8 @@ type CreateParams struct {
 }
 
 type CreateResponse struct {
-	CreatedAt int64    `json:"created,omitempty"`
-	Data      []*Image `json:"data,omitempty"`
+	Created int64    `json:"created,omitempty"`
+	Data    []*Image `json:"data,omitempty"`
 }
 
 func (c *Client) Create(ctx context.Context, p *CreateParams) (*CreateResponse, error) {

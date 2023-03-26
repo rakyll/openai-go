@@ -26,8 +26,8 @@ type CreateEditParams struct {
 }
 
 type CreateEditResponse struct {
-	CreatedAt int64    `json:"created,omitempty"`
-	Data      []*Image `json:"data,omitempty"`
+	Created int64    `json:"created,omitempty"`
+	Data    []*Image `json:"data,omitempty"`
 }
 
 func (c *Client) CreateEdit(ctx context.Context, p *CreateEditParams) (*CreateEditResponse, error) {
