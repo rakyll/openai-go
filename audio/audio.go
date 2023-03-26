@@ -67,5 +67,5 @@ func (c *Client) CreateTranscription(ctx context.Context, p *CreateTranscription
 		params.Set("prompt", p.Prompt)
 	}
 	var r CreateTranscriptionResponse
-	return &r, c.s.Upload(ctx, c.CreateTranscriptionEndpoint, p.Audio, p.AudioFormat, params, &r)
+	return &r, c.s.Upload(ctx, c.CreateTranscriptionEndpoint, map[string]io.Reader{"file": p.Audio}, p.AudioFormat, params, &r)
 }

@@ -107,11 +107,11 @@ func (s *Session) MakeStreamingRequest(ctx context.Context, endpoint string, inp
 // Upload makes a multi-part form data upload them with
 // session's API key. Upload combines the file with the given params
 // and unmarshals the response as output.
-func (s *Session) Upload(ctx context.Context, endpoint string, file io.Reader, fileExt string, params url.Values, output any) error {
+func (s *Session) Upload(ctx context.Context, endpoint string, files map[string]io.Reader, fileExt string, params url.Values, output any) error {
 	pr, pw := io.Pipe()
 	mw := multipart.NewWriter(pw)
 	go func() {
-		err := upload(mw, file, fileExt, params)
+		err := upload(mw, files, fileExt, params)
 		pw.CloseWithError(err)
 	}()
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, endpoint, pr)
@@ -155,7 +155,7 @@ func (s *Session) makeRequest(req *http.Request, contentType string) (io.ReadClo
 	return resp.Body, nil
 }
 
-func upload(mw *multipart.Writer, file io.Reader, fileExt string, params url.Values) error {
+func upload(mw *multipart.Writer, files map[string]io.Reader, fileExt string, params url.Values) error {
 	for key := range params {
 		w, err := mw.CreateFormField(key)
 		if err != nil {
@@ -165,13 +165,16 @@ func upload(mw *multipart.Writer, file io.Reader, fileExt string, params url.Val
 			return fmt.Errorf("error writing %q field: %w", key, err)
 		}
 	}
-	w, err := mw.CreateFormFile("file", "audio."+fileExt)
-	if err != nil {
-		return fmt.Errorf("error creating file: %w", err)
+	for k, file := range files {
+		w, err := mw.CreateFormFile(k, fmt.Sprintf("%s.%s", k, fileExt))
+		if err != nil {
+			return fmt.Errorf("error creating file %s: %w", k, err)
+		}
+		if _, err := io.Copy(w, file); err != nil {
+			return fmt.Errorf("error copying file %s: %w", k, err)
+		}
 	}
-	if _, err := io.Copy(w, file); err != nil {
-		return fmt.Errorf("error copying file: %w", err)
-	}
+
 	if err := mw.Close(); err != nil {
 		return fmt.Errorf("error closing multipart writer: %w", err)
 	}
