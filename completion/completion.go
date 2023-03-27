@@ -44,7 +44,7 @@ type CreateParams struct {
 
 	MaxTokens   int     `json:"max_tokens,omitempty"`
 	N           int     `json:"n,omitempty"`
-	TopP        float64 `json:"top_n,omitempty"`
+	TopP        float64 `json:"top_p,omitempty"`
 	Temperature float64 `json:"temperature,omitempty"`
 
 	LogProbs         int     `json:"logprobs,omitempty"`
