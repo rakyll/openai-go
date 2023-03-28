@@ -69,6 +69,7 @@ type Choice struct {
 type Message struct {
 	Role    string `json:"role,omitempty"`
 	Content string `json:"content,omitempty"`
+	Name    string `json:"name,omitempty"`
 }
 
 func (c *Client) CreateCompletion(ctx context.Context, p *CreateCompletionParams) (*CreateCompletionResponse, error) {
