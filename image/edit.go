@@ -19,7 +19,7 @@ type CreateEditParams struct {
 	Size           string
 	ResponseFormat string
 	User           string
-	N              *int
+	N              int
 
 	Image io.Reader
 	Mask  io.Reader
@@ -38,8 +38,8 @@ func (c *Client) CreateEdit(ctx context.Context, p *CreateEditParams) (*CreateEd
 	if p.Size != "" {
 		params.Set("size", p.Size)
 	}
-	if p.N != nil {
-		params.Set("n", fmt.Sprintf("%d", *p.N))
+	if p.N != 0 {
+		params.Set("n", fmt.Sprintf("%d", p.N))
 	}
 	if p.ResponseFormat != "" {
 		params.Set("response_format", p.ResponseFormat)

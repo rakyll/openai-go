@@ -36,9 +36,7 @@ func main() {
 	}
 	defer mask.Close()
 
-	var n *int
 	resp, err := client.CreateEdit(ctx, &image.CreateEditParams{
-		N:      n,
 		Prompt: "A cute baby sea otter wearing a beret",
 		Size:   "1024x1024",
 		Image:  img,
@@ -58,6 +56,5 @@ func main() {
 			log.Fatalf("ReadAll error: %v", err)
 		}
 		_ = data // use data
-
 	}
 }
