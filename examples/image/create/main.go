@@ -35,6 +35,5 @@ func main() {
 			log.Fatalf("ReadAll error: %v", err)
 		}
 		_ = data // use data
-		println(string(data))
 	}
 }
