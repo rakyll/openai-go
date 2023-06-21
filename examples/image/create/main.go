@@ -16,10 +16,10 @@ func main() {
 
 	client := image.NewClient(s)
 	resp, err := client.Create(ctx, &image.CreateParams{
-		N:              3,
-		Prompt:         "a cute baby",
-		Size:           "1024x1024",
-		ResponseFormat: "b64_json",
+		N:      3,
+		Prompt: "a cute baby",
+		Size:   "1024x1024",
+		Format: "b64_json",
 	})
 	if err != nil {
 		log.Fatalf("Failed to generate image: %v", err)
@@ -35,6 +35,6 @@ func main() {
 			log.Fatalf("ReadAll error: %v", err)
 		}
 		_ = data // use data
-
+		println(string(data))
 	}
 }
