@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	"io/ioutil"
+	"io"
 	"log"
 	"os"
 
@@ -30,7 +30,7 @@ func main() {
 		if err != nil {
 			log.Fatalf("Failed to read image data: %v", err)
 		}
-		data, err := ioutil.ReadAll(reader)
+		data, err := io.ReadAll(reader)
 		if err != nil {
 			log.Fatalf("ReadAll error: %v", err)
 		}

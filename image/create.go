@@ -3,6 +3,9 @@ package image
 
 import "context"
 
+// CreateParams are create image parameters. Refer to OpenAI documentation
+// at https://platform.openai.com/docs/api-reference/images/create
+// for reference.
 type CreateParams struct {
 	Prompt string `json:"prompt,omitempty"`
 	N      int    `json:"n,omitempty"`
@@ -12,7 +15,7 @@ type CreateParams struct {
 }
 
 type CreateResponse struct {
-	CreatedAt int64    `json:"created_at,omitempty"`
+	CreatedAt int64    `json:"created,omitempty"`
 	Data      []*Image `json:"data,omitempty"`
 }
 
