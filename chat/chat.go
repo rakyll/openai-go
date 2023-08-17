@@ -42,6 +42,9 @@ type CreateCompletionParams struct {
 	Stop     []string   `json:"stop,omitempty"`
 	Stream   bool       `json:"stream,omitempty"`
 
+	Functions    []Function `json:"functions,omitempty"`
+	FunctionCall string     `json:"function_call,omitempty"`
+
 	N           int     `json:"n,omitempty"`
 	TopP        float64 `json:"top_p,omitempty"`
 	Temperature float64 `json:"temperature,omitempty"`
@@ -70,9 +73,10 @@ type Choice struct {
 }
 
 type Message struct {
-	Role    string `json:"role,omitempty"`
-	Content string `json:"content,omitempty"`
-	Name    string `json:"name,omitempty"`
+	Role         string        `json:"role,omitempty"`
+	Content      string        `json:"content,omitempty"`
+	Name         string        `json:"name,omitempty"`
+	FunctionCall *FunctionCall `json:"function_call,omitempty"`
 }
 
 func (c *Client) CreateCompletion(ctx context.Context, p *CreateCompletionParams) (*CreateCompletionResponse, error) {
