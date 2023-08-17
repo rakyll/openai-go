@@ -1,5 +1,7 @@
 package chat
 
+import "encoding/json"
+
 // EmptyParameters is an empty parameter object used for a Function that accepts no arguments.
 var EmptyParameters = Schema{
 	Type:       "object",
@@ -22,8 +24,32 @@ const (
 type Schema struct {
 	Type        string            `json:"type"`
 	Description string            `json:"description,omitempty"`
-	Properties  map[string]Schema `json:"properties,omitempty"`
+	Properties  map[string]Schema `json:"properties"`
 	Required    []string          `json:"required,omitempty"`
+
+	// NOTE adding new fields may require updating the MarshalJSON method.
+}
+
+func (s Schema) MarshalJSON() ([]byte, error) {
+	type Alias Schema
+
+	// If Properties is nil marshal it without the Properties field.  This,
+	// rather than relying on omitempty, allows us to distinguish between an
+	// empty map (which is needed for valid API requests) and a nil map (which
+	// is needed for the default value).
+	if s.Properties == nil {
+		return json.Marshal(&struct {
+			Type        string   `json:"type"`
+			Description string   `json:"description,omitempty"`
+			Required    []string `json:"required,omitempty"`
+		}{
+			Type:        s.Type,
+			Description: s.Description,
+			Required:    s.Required,
+		})
+	}
+
+	return json.Marshal((*Alias)(&s))
 }
 
 // Function is a function the model may generate JSON inputs for
