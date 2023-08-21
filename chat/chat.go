@@ -70,8 +70,8 @@ type Choice struct {
 }
 
 type Message struct {
-	Role    string `json:"role,omitempty"`
-	Content string `json:"content,omitempty"`
+	Role    string `json:"role"`
+	Content string `json:"content"`
 	Name    string `json:"name,omitempty"`
 }
 
