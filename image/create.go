@@ -9,6 +9,7 @@ type CreateParams struct {
 	Size   string `json:"size,omitempty"`
 	Format string `json:"response_format,omitempty"`
 	User   string `json:"user,omitempty"`
+	Model  string `json:"model,omitempty"`
 }
 
 type CreateResponse struct {
@@ -17,6 +18,9 @@ type CreateResponse struct {
 }
 
 func (c *Client) Create(ctx context.Context, p *CreateParams) (*CreateResponse, error) {
+	if p.Model == "" {
+		p.Model = c.model
+	}
 	var r CreateResponse
 	if err := c.s.MakeRequest(ctx, c.CreateEndpoint, p, &r); err != nil {
 		return nil, err

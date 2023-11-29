@@ -12,12 +12,16 @@ import (
 )
 
 const (
+	DallE2                = "dall-e-2"
+	DallE3                = "dall-e-3"
 	defaultCreateEndpoint = "https://api.openai.com/v1/images/generations"
+	defaultModel          = DallE2
 )
 
 // Client is a client to communicate with Open AI's images API.
 type Client struct {
-	s *openai.Session
+	s     *openai.Session
+	model string
 
 	// CreateEndpoint allows overriding the default
 	// for the image generation API endpoint.
@@ -25,9 +29,14 @@ type Client struct {
 	CreateEndpoint string
 }
 
-func NewClient(session *openai.Session) *Client {
+func NewClient(session *openai.Session, model ...string) *Client {
+	m := defaultModel
+	if len(model) > 0 {
+		m = model[0]
+	}
 	return &Client{
 		s:              session,
+		model:          m,
 		CreateEndpoint: defaultCreateEndpoint,
 	}
 }
